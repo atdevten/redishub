@@ -1,4 +1,5 @@
 import "./globals.css"
+import Script from "next/script"
 import * as React from "react"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           </ConfirmProvider>
         </ThemeProvider>
       </body>
+      <Script src="/scorix.bridge.js" strategy="beforeInteractive" />
     </html>
   )
 }
