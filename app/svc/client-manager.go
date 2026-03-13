@@ -63,7 +63,9 @@ func (m *ClientManager) init(cfg *do.ConnectionDO, dbIdx int) (*redis.Client, er
 		Username:        cfg.Username,
 		Password:        cfg.Password,
 		DB:              dbIdx,
-		DialTimeout:     5 * time.Second,
+		ReadTimeout:     time.Duration(cfg.ExecTimeout) * time.Second,
+		WriteTimeout:    time.Duration(cfg.ExecTimeout) * time.Second,
+		DialTimeout:     time.Duration(cfg.DialTimeout) * time.Second,
 		DisableIdentity: true,
 		IdentitySuffix:  "redishub_",
 	}

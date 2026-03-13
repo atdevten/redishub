@@ -20,6 +20,7 @@ type SshDO struct {
 	Password       string          `json:"password" gorm:"column:password;"`
 	PrivateKeyFile string          `json:"private_key_file" gorm:"column:private_key_file;"`
 	Passphrase     string          `json:"passphrase" gorm:"column:passphrase;"`
+	Timeout        int64           `json:"timeout" gorm:"column:timeout;;default:10;"`
 	Connections    []*ConnectionDO `json:"connections,omitempty" gorm:"foreignKey:SshId"`
 }
 
@@ -82,7 +83,7 @@ func (d *SshDO) BuildClientCfg() (*ssh.ClientConfig, error) {
 			authMethod,
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-		Timeout:         5 * time.Second,
+		Timeout:         time.Duration(d.Timeout) * time.Second,
 	}, nil
 }
 

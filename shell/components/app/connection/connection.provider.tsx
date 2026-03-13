@@ -19,6 +19,8 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       sock: "/tmp/redis.sock",
       username: "",
       password: "",
+      exec_timeout: 10,
+      dial_timeout: 10,
       ssh_id: "",
       ssh_enable: false,
     })

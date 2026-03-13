@@ -10,6 +10,8 @@ import { SshKindEnum } from "@/types/ssh-kind.enum"
 import { useDeleteSsh, useTestSsh, useUpsertSsh } from "@/hooks/api/ssh.api"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useTranslation } from "react-i18next"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 export interface PendingState {
   save: boolean
@@ -33,8 +35,22 @@ interface Props {
 export const SshForm = forwardRef<SshFormRef, Props>(({ ssh, onPendingChange, onSaved, onDeleted }, ref) => {
   const { t } = useTranslation()
 
-  const form = useForm<Partial<SshDO>>({
+  const sshSchema = z.object({
+    host: z.string(),
+    port: z.number(),
+    timeout: z.number(),
+    username: z.string(),
+    kind: z.nativeEnum(SshKindEnum),
+    password: z.string().optional(),
+    private_key_file: z.string().optional(),
+    passphrase: z.string().optional(),
+  })
+
+  type SshFormValues = z.infer<typeof sshSchema>
+
+  const form = useForm<SshFormValues>({
     defaultValues: ssh,
+    resolver: zodResolver(sshSchema),
   })
 
   const upsertSsh = useUpsertSsh()
@@ -120,6 +136,19 @@ export const SshForm = forwardRef<SshFormRef, Props>(({ ssh, onPendingChange, on
           render={({ field }) => (
             <FormItem>
               <FormLabel>Port</FormLabel>
+              <FormControl>
+                <Input type="number" value={field.value ?? ""} onChange={e => field.onChange(e.target.value === "" ? undefined : Number(e.target.value))} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="timeout"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Timeout (s)</FormLabel>
               <FormControl>
                 <Input type="number" value={field.value ?? ""} onChange={e => field.onChange(e.target.value === "" ? undefined : Number(e.target.value))} />
               </FormControl>

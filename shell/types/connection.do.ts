@@ -16,6 +16,8 @@ export type ConnectionDO = {
   username: string
   password: string
   last_db: number
+  exec_timeout: number
+  dial_timeout: number
   ssh_enable: boolean
   ssh_id: string
   ssh: SshDO

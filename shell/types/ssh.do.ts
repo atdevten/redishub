@@ -8,6 +8,7 @@ export type SshDO = {
   deleted_at: string
   host: string
   port: number
+  timeout: number
   username: string
   kind: SshKindEnum
   password: string

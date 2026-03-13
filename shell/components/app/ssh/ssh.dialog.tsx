@@ -30,6 +30,7 @@ export function SshDialog({ open, onOpenChange }: Props) {
       id: uuidv7(),
       host: "127.0.0.1",
       port: 22,
+      timeout: 10,
       username: "",
       kind: SshKindEnum.PASSWORD,
       password: "",
