@@ -317,7 +317,7 @@ function KeyTtlUpdateDialog({ children, reload, databaseId, databaseIdx, keyName
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]" onInteractOutside={e => e.preventDefault()} onEscapeKeyDown={e => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle>{t("update_ttl")}</DialogTitle>
+          <DialogTitle className="text-sm">{t("update_ttl")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={submit} className="grid gap-4">

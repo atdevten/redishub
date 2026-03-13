@@ -36,7 +36,7 @@ export function ConnectionDetail({ connectionId, selectedKey }: { connectionId: 
   ]
 
   return (
-    <Tabs value={selectedSection} onValueChange={setSelectedSection} className="min-h-0 p-3.5 h-full">
+    <Tabs value={selectedSection} onValueChange={setSelectedSection} className="min-h-0 p-2 h-full">
       <TabsList>
         {tabs.map(tab => (
           <TabsTrigger key={tab.value} value={tab.value}>

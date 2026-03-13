@@ -74,45 +74,25 @@ export function SidebarTool() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              className="px-2.5 md:px-2"
-              tooltip={{ children: "GitHub", hidden: false }}
-              onClick={e => {
-                e.preventDefault()
-                scorix.invoke("ext:browser:OpenUrl", "https://github.com/tradalab/redishub")
-              }}
-            >
-              <GithubIcon />
-              <span>GitHub</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              className="px-2.5 md:px-2"
-              tooltip={{ children: t("report_issues"), hidden: false }}
-              onClick={e => {
-                e.preventDefault()
-                scorix.invoke("ext:browser:OpenUrl", "https://github.com/tradalab/redishub/issues")
-              }}
-            >
-              <BugIcon />
-              <span>{t("report_issues")}</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              className="px-2.5 md:px-2"
-              tooltip={{ children: t("documentation"), hidden: false }}
-              onClick={e => {
-                e.preventDefault()
-                scorix.invoke("ext:browser:OpenUrl", "https://redishub.tradalab.com/")
-              }}
-            >
-              <BookOpenIcon />
-              <span>{t("documentation")}</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          {[
+            { title: "Github", icon: <GithubIcon />, url: "https://github.com/tradalab/redishub" },
+            { title: t("report_issues"), icon: <BugIcon />, url: "https://github.com/tradalab/redishub/issues" },
+            { title: t("documentation"), icon: <BookOpenIcon />, url: "https://redishub.tradalab.com/" },
+          ].map((item, i) => (
+            <SidebarMenuItem key={i}>
+              <SidebarMenuButton
+                className="px-2.5 md:px-2"
+                tooltip={{ children: item.title, hidden: false }}
+                onClick={e => {
+                  e.preventDefault()
+                  scorix.invoke("ext:browser:OpenUrl", item.url)
+                }}
+              >
+                {item.icon}
+                <span>{item.title}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
           <SidebarMenuItem>
             <SettingDialog>
               <SidebarMenuButton tooltip={{ children: t("settings"), hidden: false }} className="px-2.5 md:px-2">

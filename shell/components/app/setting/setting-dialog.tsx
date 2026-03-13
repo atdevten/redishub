@@ -48,7 +48,7 @@ export function SettingDialog({ children }: { children: ReactNode }) {
                 </a>
               ))}
             </div>
-            <span className="font-bold">v{version}</span>
+            <span className="text-xs font-bold">v{version}</span>
           </div>
         </DialogFooter>
       </DialogContent>

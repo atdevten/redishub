@@ -229,7 +229,7 @@ export function ConnectionDetailTabConsole({ connectionId, databaseIdx }: { conn
     let pendingDangerous: {
       name: string
       hash: string
-      expiresAt: number
+      expires_at: number
     } | null = null
 
     const normalizeCommand = (cmd: string) => cmd.trim().replace(/\s+/g, " ")
@@ -251,7 +251,7 @@ export function ConnectionDetailTabConsole({ connectionId, databaseIdx }: { conn
       const now = Date.now()
 
       if (DANGEROUS.includes(name)) {
-        if (pendingDangerous && pendingDangerous.expiresAt < now) {
+        if (pendingDangerous && pendingDangerous.expires_at < now) {
           pendingDangerous = null
         }
 
@@ -259,7 +259,7 @@ export function ConnectionDetailTabConsole({ connectionId, databaseIdx }: { conn
           pendingDangerous = {
             name,
             hash,
-            expiresAt: now + CONFIRM_TIMEOUT,
+            expires_at: now + CONFIRM_TIMEOUT,
           }
 
           termRef.current?.writeln(`\x1b[33m⚠ Dangerous command detected\x1b[0m`)

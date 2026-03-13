@@ -71,17 +71,9 @@ export function BrowserAddKeyDialog({ children }: { children: ReactNode }) {
   return (
     <Dialog open={open} onOpenChange={value => !form.formState.isSubmitting && setOpen(value)}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent
-        className="sm:max-w-[625px]"
-        onInteractOutside={e => {
-          e.preventDefault()
-        }}
-        onEscapeKeyDown={e => {
-          e.preventDefault()
-        }}
-      >
+      <DialogContent className="sm:max-w-[625px]" onInteractOutside={e => e.preventDefault()} onEscapeKeyDown={e => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle>{t("new_key")}</DialogTitle>
+          <DialogTitle className="text-sm">{t("new_key")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={submit} className="grid gap-4">
