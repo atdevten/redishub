@@ -15,8 +15,8 @@ type ConnectionDO struct {
 	Username    string   `json:"username" gorm:"column:username;"`
 	Password    string   `json:"password" gorm:"column:password;"`
 	LastDb      int      `json:"last_db" gorm:"column:last_db;default:0;"`
-	ExecTimeout int64    `json:"exec_timeout" gorm:"column:exec_timeout;default:10;"`
-	DialTimeout int64    `json:"dial_timeout" gorm:"column:dial_timeout;default:10;"`
+	ExecTimeout int64    `json:"exec_timeout" gorm:"column:exec_timeout;default:60;"`
+	DialTimeout int64    `json:"dial_timeout" gorm:"column:dial_timeout;default:60;"`
 	GroupId     *string  `json:"group_id" gorm:"column:group_id;size:36;"`
 	Group       *GroupDO `json:"group,omitempty" gorm:"foreignKey:GroupId;references:Id"`
 	SshEnable   bool     `json:"ssh_enable" gorm:"column:ssh_enable;"`

@@ -41,7 +41,7 @@ func (m *ClientManager) Add(cfg *do.ConnectionDO, dbIdx int) (*Client, error) {
 		return nil, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(cfg.DialTimeout)*time.Second)
 	defer cancel()
 
 	if err := rdb.Ping(ctx).Err(); err != nil {
@@ -138,7 +138,7 @@ func (m *ClientManager) Test(cfg *do.ConnectionDO, dbIdx int) error {
 	}
 
 	// test connection
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(cfg.DialTimeout)*time.Second)
 	defer cancel()
 	if err := rdb.Ping(ctx).Err(); err != nil {
 		return fmt.Errorf("cannot connect to redis %s: %w", cfg.Addr(), err)
