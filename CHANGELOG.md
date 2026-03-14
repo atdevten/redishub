@@ -2,6 +2,26 @@
 
 ---
 
+## [1.6.0]
+
+### 🚀 Features
+
+- **release:** Add release script and update environment configuration
+- **connection:** Add SSL/TLS support
+- **ssh:** Support using private key content instead of file path
+- **connection:** Load key size and add connection form panel options
+- **deps:** Update Scorix version
+
+### 🐛 Fixes
+
+- **select:** Prevent unselecting the currently selected option
+
+### ♻️ Improvements & Refactors
+
+- **config:** Increase default timeout to 60 seconds
+
+---
+
 ## [1.5.0]
 
 ### 🚀 Features
