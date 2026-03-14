@@ -12,7 +12,7 @@ export type SshDO = {
   username: string
   kind: SshKindEnum
   password: string
-  private_key_file: string
+  private_key: string
   passphrase: string
   connections: ConnectionDO[]
 }

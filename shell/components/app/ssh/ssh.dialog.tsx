@@ -34,7 +34,7 @@ export function SshDialog({ open, onOpenChange }: Props) {
       username: "",
       kind: SshKindEnum.PASSWORD,
       password: "",
-      private_key_file: "",
+      private_key: "",
       passphrase: "",
     })
   }

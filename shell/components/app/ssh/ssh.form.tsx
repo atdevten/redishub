@@ -3,6 +3,7 @@
 import { useEffect, forwardRef, useImperativeHandle } from "react"
 import { useForm } from "react-hook-form"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
 import { SshDO } from "@/types/ssh.do"
@@ -42,7 +43,7 @@ export const SshForm = forwardRef<SshFormRef, Props>(({ ssh, onPendingChange, on
     username: z.string(),
     kind: z.nativeEnum(SshKindEnum),
     password: z.string().optional(),
-    private_key_file: z.string().optional(),
+    private_key: z.string().optional(),
     passphrase: z.string().optional(),
   })
 
@@ -212,12 +213,12 @@ export const SshForm = forwardRef<SshFormRef, Props>(({ ssh, onPendingChange, on
           <>
             <FormField
               control={form.control}
-              name="private_key_file"
+              name="private_key"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("private_key_file")}</FormLabel>
+                  <FormLabel>{t("private_key")}</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Textarea {...field} className="font-mono text-xs min-h-[120px]" placeholder={t("enter_private_key_pem")} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -26,7 +26,7 @@ export function useUpsertSsh() {
       const sql = `
         INSERT
         OR REPLACE INTO ssh
-        (id, host, port, username, kind, password, private_key_file, passphrase)
+        (id, host, port, username, kind, password, private_key, passphrase)
         VALUES (
           '${id}',
           '${values.host ?? ""}',
@@ -34,7 +34,7 @@ export function useUpsertSsh() {
           '${values.username ?? ""}',
           '${values.kind ?? ""}',
           '${values.password ?? ""}',
-          '${values.private_key_file ?? ""}',
+          '${values.private_key ?? ""}',
           '${values.passphrase ?? ""}'
         )
       `

@@ -26,7 +26,7 @@ export function useUpsertConnection() {
       const sql = `
         INSERT
         OR REPLACE INTO "connection"
-        (id, name, network, host, port, sock, username, password, group_id, ssh_id, ssh_enable)
+        (id, name, network, host, port, sock, username, password, group_id, ssh_id, ssh_enable, tls_id, tls_enable)
         VALUES (
           '${id}',
           '${values.name ?? ""}',
@@ -36,9 +36,11 @@ export function useUpsertConnection() {
           '${values.sock ?? ""}',
           '${values.username ?? ""}',
           '${values.password ?? ""}',
-          '${values.group_id ?? ""}',
-          '${values.ssh_id ?? ""}',
-          ${values.ssh_enable ?? false}
+          ${values.group_id ? `'${values.group_id}'` : 'NULL'},
+          ${values.ssh_id ? `'${values.ssh_id}'` : 'NULL'},
+          ${values.ssh_enable ? 1 : 0},
+          ${values.tls_id ? `'${values.tls_id}'` : 'NULL'},
+          ${values.tls_enable ? 1 : 0}
         )
       `
       await scorix.invoke("mod:gorm:Query", {sql})

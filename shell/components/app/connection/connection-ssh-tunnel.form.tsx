@@ -45,11 +45,12 @@ export function ConnectionSshTunnelForm({ form }: { form: UseFormReturn }) {
               <FormLabel>{t("ssh_configuration")}</FormLabel>
               <div className="flex gap-1">
                 <FormControl>
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select value={field.value || "none"} onValueChange={val => field.onChange(val === "none" ? "" : val)}>
                     <SelectTrigger className="flex-1">
-                      <SelectValue />
+                      <SelectValue placeholder={t("ssh_configuration")} />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="none">{t("none")}</SelectItem>
                       {sshList?.map(ssh => (
                         <SelectItem key={ssh.id} value={ssh.id}>
                           {ssh.username}@{ssh.host}:{ssh.port}

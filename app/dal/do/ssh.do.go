@@ -18,7 +18,7 @@ type SshDO struct {
 	Username       string          `json:"username" gorm:"column:username;"`
 	Kind           string          `json:"kind" gorm:"column:kind;"`
 	Password       string          `json:"password" gorm:"column:password;"`
-	PrivateKeyFile string          `json:"private_key_file" gorm:"column:private_key_file;"`
+	PrivateKey     string          `json:"private_key" gorm:"column:private_key;"`
 	Passphrase     string          `json:"passphrase" gorm:"column:passphrase;"`
 	Timeout        int64           `json:"timeout" gorm:"column:timeout;default:60;"`
 	Connections    []*ConnectionDO `json:"connections,omitempty" gorm:"foreignKey:SshId"`
@@ -33,17 +33,13 @@ func (d *SshDO) BuildAuthMethod() (ssh.AuthMethod, error) {
 	case "password":
 		return ssh.Password(d.Password), nil
 	case "keypair":
-		key, err := os.ReadFile(d.PrivateKeyFile)
-		if err != nil {
-			return nil, fmt.Errorf("read private key failed: %w", err)
-		}
-
 		var signer ssh.Signer
+		var err error
 
 		if d.Passphrase != "" {
-			signer, err = ssh.ParsePrivateKeyWithPassphrase(key, []byte(d.Passphrase))
+			signer, err = ssh.ParsePrivateKeyWithPassphrase([]byte(d.PrivateKey), []byte(d.Passphrase))
 		} else {
-			signer, err = ssh.ParsePrivateKey(key)
+			signer, err = ssh.ParsePrivateKey([]byte(d.PrivateKey))
 		}
 
 		if err != nil {

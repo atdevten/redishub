@@ -46,11 +46,12 @@ export function ConnectionTlsForm({ form }: { form: UseFormReturn }) {
               <FormLabel>{t("tls_configuration")}</FormLabel>
               <div className="flex gap-1">
                 <FormControl>
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select value={field.value || "none"} onValueChange={val => field.onChange(val === "none" ? "" : val)}>
                     <SelectTrigger className="flex-1">
                       <SelectValue placeholder={t("tls_configuration")} />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="none">{t("none")}</SelectItem>
                       {tlsList?.map((tlsDO: TlsDO) => (
                         <SelectItem key={tlsDO.id} value={tlsDO.id}>
                           {tlsDO.name || tlsDO.server_name || tlsDO.id}
