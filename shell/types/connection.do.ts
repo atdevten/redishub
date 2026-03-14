@@ -1,5 +1,6 @@
-import {GroupDO} from "@/types/group.do"
-import {SshDO} from "@/types/ssh.do"
+import { GroupDO } from "@/types/group.do"
+import { SshDO } from "@/types/ssh.do"
+import { TlsDO } from "@/types/tls.do"
 
 export type ConnectionDO = {
   id: string
@@ -21,4 +22,7 @@ export type ConnectionDO = {
   ssh_enable: boolean
   ssh_id: string
   ssh: SshDO
+  tls_enable: boolean
+  tls_id: string
+  tls: TlsDO
 }

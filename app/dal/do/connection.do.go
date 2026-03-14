@@ -22,6 +22,9 @@ type ConnectionDO struct {
 	SshEnable   bool     `json:"ssh_enable" gorm:"column:ssh_enable;"`
 	SshId       *string  `json:"ssh_id" gorm:"column:ssh_id;size:36;"`
 	Ssh         *SshDO   `json:"ssh,omitempty" gorm:"foreignKey:SshId;references:Id"`
+	TlsEnable   bool     `json:"tls_enable" gorm:"column:tls_enable;"`
+	TlsId       *string  `json:"tls_id" gorm:"column:tls_id;size:36;"`
+	Tls         *TlsDO   `json:"tls,omitempty" gorm:"foreignKey:TlsId;references:Id"`
 }
 
 func (d *ConnectionDO) TableName() string {

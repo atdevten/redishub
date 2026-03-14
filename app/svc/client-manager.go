@@ -116,6 +116,15 @@ func (m *ClientManager) init(cfg *do.ConnectionDO, dbIdx int) (*redis.Client, er
 		options.Addr = localAddr
 	}
 
+	// set TLS
+	if cfg.TlsEnable && cfg.Tls != nil {
+		tlsConfig, err := cfg.Tls.BuildTlsConfig()
+		if err != nil {
+			return nil, fmt.Errorf("tls build failed: %w", err)
+		}
+		options.TLSConfig = tlsConfig
+	}
+
 	rdb := redis.NewClient(options)
 
 	return rdb, nil

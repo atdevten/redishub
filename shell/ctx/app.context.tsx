@@ -10,6 +10,7 @@ import { ConnectionDO } from "@/types/connection.do"
 import { useSetting } from "@/hooks/use-setting"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { SshProvider } from "@/components/app/ssh/ssh.provider"
+import { TlsProvider } from "@/components/app/tls/tls.provider"
 import { ConnectionProvider } from "@/components/app/connection/connection.provider"
 import { GroupProvider } from "@/components/app/group/group.provider"
 
@@ -52,7 +53,7 @@ const queryClient = new QueryClient({
 
 const AppContext = createContext<AppContextType | undefined>(undefined)
 
-export const AppProvider = ({children}: { children: ReactNode }) => {
+export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [selectedTab, setSelectedTab] = useState<string>("/connections")
   const [selectedSection, setSelectedSection] = useState<string>("general")
   const [selectedDb, setSelectedDb] = useState<string | undefined>()
@@ -130,11 +131,13 @@ export const AppProvider = ({children}: { children: ReactNode }) => {
           }}
         >
           <SshProvider>
-            <ConnectionProvider>
-              <GroupProvider>
-                {children}
-              </GroupProvider>
-            </ConnectionProvider>
+            <TlsProvider>
+              <ConnectionProvider>
+                <GroupProvider>
+                  {children}
+                </GroupProvider>
+              </ConnectionProvider>
+            </TlsProvider>
           </SshProvider>
         </AppContext.Provider>
       </QueryClientProvider>

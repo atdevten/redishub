@@ -23,12 +23,14 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       dial_timeout: 10,
       ssh_id: "",
       ssh_enable: false,
+      tls_id: "",
+      tls_enable: false,
     })
     setOpen(true)
   }
 
   const handleEdit = (conn: ConnectionDO) => {
-    setConnection({ ...conn, ssh_enable: Boolean(conn.ssh_enable) })
+    setConnection({ ...conn, ssh_enable: Boolean(conn.ssh_enable), tls_enable: Boolean(conn.tls_enable) })
     setOpen(true)
   }
 
