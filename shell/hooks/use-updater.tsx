@@ -32,6 +32,11 @@ export function useUpdater() {
   const fullUpdate = async () => {
     setLoading(true)
     try {
+      const info: { platform: string } = await scorix.invoke("system:info", {})
+      if (info.platform === "linux") {
+        await scorix.invoke("mod:browser:OpenUrl", { url: "https://github.com/tradalab/redishub/releases" })
+        return
+      }
       await scorix.invoke("mod:updater:FullUpdate", {})
     } catch (e: any) {
       const msg = e instanceof Error ? e.message : typeof e === "string" ? e : "Unknown error"
