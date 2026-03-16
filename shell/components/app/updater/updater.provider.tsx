@@ -1,29 +1,42 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { ReactNode, useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
-import { cn } from "@/lib/utils"
 import scorix from "@/lib/scorix"
+import { cn } from "@/lib/utils"
 import { useSetting } from "@/hooks/use-setting"
 import { Spinner } from "@/components/ui/spinner"
+import { UpdaterContext } from "./updater.context"
 
-export function useUpdater() {
+export const UpdaterProvider = ({ children }: { children: ReactNode }) => {
+  const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
   const [newVersion, setNewVersion] = useState<string | undefined>()
   const [notes, setNotes] = useState<string | undefined>()
   const [autoupdate] = useSetting("autoupdate")
+  const [lastCheck, setLastCheck] = useSetting("last_update_check")
 
-  const checkUpdate = async () => {
+  const checkUpdate = async (options?: { silent?: boolean }) => {
     setLoading(true)
     try {
       const res: { new_version: string; notes: string } = await scorix.invoke("mod:updater:CheckForUpdate", {})
       setNewVersion(res.new_version)
       setNotes(res.notes)
+      await setLastCheck(Date.now().toString())
+      return res
     } catch (e: any) {
-      const msg = e instanceof Error ? e.message : typeof e === "string" ? e : "Unknown error"
-      if (msg !== "no update available" && !msg.includes("No connection could be made because the target machine actively refused it")) {
-        toast.error(msg)
+      const msg = e instanceof Error ? e.message : typeof e === "string" ? e : "unknown_error"
+      const isNoUpdate = msg === "no update available"
+
+      if (!options?.silent && !isNoUpdate && !msg.includes("No connection could be made because the target machine actively refused it")) {
+        toast.error(t(msg as any, { defaultValue: msg }))
       }
+
+      if (isNoUpdate) {
+        await setLastCheck(Date.now().toString())
+      }
+      return null
     } finally {
       setLoading(false)
     }
@@ -39,8 +52,8 @@ export function useUpdater() {
       }
       await scorix.invoke("mod:updater:FullUpdate", {})
     } catch (e: any) {
-      const msg = e instanceof Error ? e.message : typeof e === "string" ? e : "Unknown error"
-      toast.error(msg)
+      const msg = e instanceof Error ? e.message : typeof e === "string" ? e : "unknown_error"
+      toast.error(t(msg as any, { defaultValue: msg }))
     } finally {
       setLoading(false)
     }
@@ -49,7 +62,7 @@ export function useUpdater() {
   const popup = () => {
     if (!newVersion || !notes) return
 
-    toast(`New version ${newVersion} available`, {
+    toast(t("update_available", { v: newVersion }), {
       id: "updater",
       description: <div>{notes}</div>,
       action: (
@@ -61,7 +74,7 @@ export function useUpdater() {
             className={cn("", { "!text-muted-foreground !cursor-not-allowed": loading })}
             onClick={() => toast.dismiss("updater")}
           >
-            Later
+            {t("later")}
           </button>
           <button
             data-button="true"
@@ -70,7 +83,7 @@ export function useUpdater() {
             className={cn("", { "!text-muted-foreground !cursor-not-allowed": loading })}
             onClick={() => fullUpdate()}
           >
-            {loading && <Spinner />} Update
+            {loading && <Spinner />} {t("update")}
           </button>
         </div>
       ),
@@ -84,12 +97,18 @@ export function useUpdater() {
   }
 
   useEffect(() => {
-    if (autoupdate == "true") checkUpdate()
-  }, [autoupdate])
+    if (autoupdate === "false") return
 
-  useEffect(() => {
-    popup()
-  }, [loading, newVersion, notes])
+    const last = parseInt(lastCheck || "0")
+    const now = Date.now()
+    if (now - last < 24 * 60 * 60 * 1000) return
 
-  return { checkUpdate, fullUpdate, newVersion, notes, loading }
+    checkUpdate({ silent: true }).then(res => {
+      if (res) {
+        popup()
+      }
+    })
+  }, [autoupdate, lastCheck])
+
+  return <UpdaterContext.Provider value={{ loading, newVersion, notes, checkUpdate, fullUpdate, popup }}>{children}</UpdaterContext.Provider>
 }
