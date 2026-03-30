@@ -1,12 +1,14 @@
 "use client"
 
 import * as React from "react"
+import { useTranslation } from "react-i18next"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { RefreshCcw, Wifi, WifiOff } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function ConnectionStatus() {
+  const { t } = useTranslation()
   const [status, setStatus] = React.useState<"connected" | "connecting" | "disconnected">("connected")
   const [isWebMode, setIsWebMode] = React.useState(false)
 
@@ -50,7 +52,7 @@ export function ConnectionStatus() {
         >
           <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
           <Wifi className="h-3.5 w-3.5" />
-          <span className="text-xs font-medium uppercase tracking-wider">Connected</span>
+          <span className="text-xs font-medium uppercase tracking-wider">{t("conn_connected")}</span>
         </Badge>
       ) : status === "connecting" ? (
         <Badge
@@ -58,13 +60,13 @@ export function ConnectionStatus() {
           className="bg-background/80 backdrop-blur border-amber-500/50 text-amber-600 dark:text-amber-400 gap-1.5 px-3 py-1 shadow-sm transition-all animate-pulse"
         >
           <RefreshCcw className="h-3.5 w-3.5 animate-spin" />
-          <span className="text-xs font-medium uppercase tracking-wider">Connecting...</span>
+          <span className="text-xs font-medium uppercase tracking-wider">{t("conn_connecting")}</span>
         </Badge>
       ) : (
         <div className="flex items-center gap-2 drop-shadow-xl">
           <Badge variant="destructive" className="gap-1.5 px-3 py-1 shadow-sm transition-all">
             <WifiOff className="h-3.5 w-3.5" />
-            <span className="text-xs font-medium uppercase tracking-wider">Disconnected</span>
+            <span className="text-xs font-medium uppercase tracking-wider">{t("conn_disconnected")}</span>
           </Badge>
           <Button
             size="sm"
@@ -73,7 +75,7 @@ export function ConnectionStatus() {
             onClick={handleReconnect}
           >
             <RefreshCcw className="h-3.5 w-3.5" />
-            <span className="text-xs font-semibold">Reconnect</span>
+            <span className="text-xs font-semibold">{t("reconnect")}</span>
           </Button>
         </div>
       )}
