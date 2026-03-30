@@ -10,7 +10,7 @@ require (
 	github.com/samber/lo v1.53.0
 	github.com/srwiley/oksvg v0.0.0-20221011165216-be6e8873101c
 	github.com/srwiley/rasterx v0.0.0-20220730225603-2ab79fcdd4ef
-	github.com/tradalab/scorix v0.1.0
+	github.com/tradalab/scorix v0.2.0
 	golang.org/x/crypto v0.49.0
 	golang.org/x/image v0.37.0
 	gorm.io/gorm v1.31.1
@@ -24,6 +24,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.30.1 // indirect
 	github.com/godbus/dbus/v5 v5.2.2 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect

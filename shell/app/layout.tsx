@@ -57,7 +57,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           </ConfirmProvider>
         </ThemeProvider>
       </body>
-      <Script src="/scorix.bridge.js" strategy="beforeInteractive" />
+      <Script src="/app.bridge.js" strategy="beforeInteractive" />
+      <Script src="/web.bridge.js" strategy="beforeInteractive" />
+      <Script src="/bridge.js" strategy="beforeInteractive" />
     </html>
   )
 }
