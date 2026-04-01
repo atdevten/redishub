@@ -12,6 +12,7 @@ import { Loading } from "@/components/app/loading"
 import { RedisKeysProvider } from "@/ctx/redis-keys.context"
 import { ThemeProvider } from "next-themes"
 import { ConfirmProvider } from "@/components/ui/trada-ui/confirm/confirm-provider"
+import { ConnectionStatus } from "@/components/app/connection-status"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                     <div className="flex-1 min-h-0 flex flex-col">{children}</div>
                     <Toaster />
                     <Loading />
+                    <ConnectionStatus />
                   </SidebarInset>
                 </SidebarProvider>
               </RedisKeysProvider>
@@ -57,7 +59,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           </ConfirmProvider>
         </ThemeProvider>
       </body>
-      <Script src="/scorix.bridge.js" strategy="beforeInteractive" />
+      <Script src="/app.bridge.js" strategy="beforeInteractive" />
+      <Script src="/web.bridge.js" strategy="beforeInteractive" />
+      <Script src="/bridge.js" strategy="beforeInteractive" />
     </html>
   )
 }

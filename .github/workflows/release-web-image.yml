@@ -1,4 +1,4 @@
-name: Build & Push Doc Image
+name: Build & Push Web Image
 
 on:
   push:
@@ -33,12 +33,12 @@ jobs:
       - name: Build & Push
         uses: docker/build-push-action@v5
         with:
-          context: ./doc
-          file: ./doc/Dockerfile
+          context: .
+          file: docker/Dockerfile_web
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}-doc:${{ steps.vars.outputs.short_sha }}
-            ghcr.io/${{ github.repository }}-doc:latest
+            ghcr.io/${{ github.repository }}-web:${{ steps.vars.outputs.short_sha }}
+            ghcr.io/${{ github.repository }}-web:latest
 
       - name: Setup SSH (GitLab)
         run: |
@@ -52,12 +52,16 @@ jobs:
           git clone ${GITOPS_GITLAB_REPO}
           cd gitops
 
-          sed -i "s|^\(\s*image:\s*\).*|\1ghcr.io/${{ github.repository }}-doc:${{ steps.vars.outputs.short_sha }}|" k8s/app/redishub/web/overlays/prod/patch-image.yaml
+          TARGET_FILE="k8s/app/redishub/web/overlays/prod/patch-image.yaml"
+          
+          if [ -f "$TARGET_FILE" ]; then
+            sed -i "s|^\(\s*image:\s*\).*|\1ghcr.io/${{ github.repository }}-web:${{ steps.vars.outputs.short_sha }}|" "$TARGET_FILE"
+          fi
 
           git config user.email "gitops-bot@tradalab.com"
           git config user.name "gitops-bot"
 
-          git commit -am "ci(redishub): update image ghcr.io/${{ github.repository }}-doc:${{ steps.vars.outputs.short_sha }}"
+          git commit -am "ci(redishub): update web image ghcr.io/${{ github.repository }}-web:${{ steps.vars.outputs.short_sha }}"
           git push
         env:
           GITOPS_GITLAB_SSH_KEY: ${{ secrets.GITOPS_GITLAB_SSH_KEY }}

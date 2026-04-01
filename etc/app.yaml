@@ -3,9 +3,15 @@ app:
   version: 1.8.0
   identifier: com.tradalab.redishub
   description: "RedisHub"
-  authors: [ "TradaLab Team" ]
+  authors: ["TradaLab Team"]
   license: "UNLICENSE"
   icon: "assets/icon.ico"
+
+mode: app
+
+web:
+  host: 127.0.0.1
+  port: 8080
 
 window:
   title: RedisHub
@@ -15,7 +21,7 @@ window:
 
 security:
   csp: none
-  allow_right_click: false
+  allow_right_click: true
   allowlist:
     fs: true
     shell: true
@@ -25,11 +31,11 @@ security:
 
 logger:
   level: debug
-  format: console        # console, json
-  output: stdout      # stdout, file, both
+  format: console # console, json
+  output: stdout # stdout, file, both
   file: logs/app.log
-  max_size: 10        # MB
-  max_age: 7          # days
+  max_size: 10 # MB
+  max_age: 7 # days
 
 modules:
   browser:

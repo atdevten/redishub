@@ -1,0 +1,75 @@
+# Stage 1: Build the frontend (Next.js)
+FROM node:22-alpine AS next-builder
+WORKDIR /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN apk add --no-cache libc6-compat
+
+# Install dependencies
+COPY shell/package.json \
+     shell/yarn.lock* \
+     shell/package-lock.json* \
+     shell/pnpm-lock.yaml* \
+     shell/.npmrc* \
+     ./
+
+RUN set -eux; \
+    if [ -f pnpm-lock.yaml ]; then \
+        corepack enable pnpm && pnpm install --frozen-lockfile; \
+    elif [ -f yarn.lock ]; then \
+        yarn install --frozen-lockfile; \
+    elif [ -f package-lock.json ]; then \
+        npm ci; \
+    else \
+        echo "No lockfile found" && exit 1; \
+    fi
+
+# Copy source and build
+COPY shell/ ./
+RUN corepack enable pnpm && pnpm run build
+
+
+# Stage 2: Build the backend (Go)
+FROM golang:1.24-alpine AS go-builder
+WORKDIR /workspace
+RUN apk add --no-cache git gcc musl-dev
+
+# Cache Go modules
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source
+COPY . .
+
+# Inject frontend artifacts for go:embed (referenced in main.go)
+COPY --from=next-builder /app/dist /workspace/.scorix/dist
+
+# Build the Go application for Linux
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-s -w" -o /workspace/redishub ./main.go
+
+
+# Stage 3: Final Runner
+FROM alpine:latest
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apk add --no-cache ca-certificates tzdata
+
+# Copy binary and configuration
+COPY --from=go-builder /workspace/redishub /app/redishub
+COPY --from=go-builder /workspace/etc/app.yaml /app/etc/app.yaml
+
+# Set environment variables for scorix web mode
+ENV SCORIX_MODE=web
+ENV SCORIX_WEB_HOST=0.0.0.0
+ENV SCORIX_WEB_PORT=8080
+
+# Overwrite config values in etc/app.yaml with environment variables
+RUN sed -i "s/^mode:.*/mode: ${SCORIX_MODE}/" etc/app.yaml && \
+    sed -i "/^web:/,/port:/ s/^\( *\)host:.*/\1host: ${SCORIX_WEB_HOST}/" etc/app.yaml && \
+    sed -i "/^web:/,/port:/ s/^\( *\)port:.*/\1port: ${SCORIX_WEB_PORT}/" etc/app.yaml
+
+EXPOSE 8080
+
+# Run the application
+CMD ["/app/redishub"]

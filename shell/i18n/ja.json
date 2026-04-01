@@ -116,5 +116,9 @@
   "addr_mapping": "アドレスマッピング (NAT)",
   "addr_mapping_help": "到達不能な内部IPを到達可能なホストアドレスに変換します。形式: 内部:ポート=外部:ポート、1行に1つ。",
   "addrs": "アドレス",
-  "addrs_placeholder": "例: 127.0.0.1:6379,127.0.0.1:6380\n1行に1つのアドレス、またはカンマ区切り"
+  "addrs_placeholder": "例: 127.0.0.1:6379,127.0.0.1:6380\n1行に1つのアドレス、またはカンマ区切り",
+  "conn_connected": "接続済み",
+  "conn_connecting": "接続中...",
+  "conn_disconnected": "切断済み",
+  "reconnect": "再接続"
 }
