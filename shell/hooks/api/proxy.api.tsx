@@ -2,7 +2,6 @@
 
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
 import scorix from "@/lib/scorix"
-import {v7 as uuidv7} from "uuid"
 
 export interface ProxyDO {
   id: string
@@ -30,21 +29,7 @@ export function useUpsertProxy() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (values: Partial<ProxyDO>) => {
-      const id = values.id ?? uuidv7()
-      const sql = `
-        INSERT
-        OR REPLACE INTO proxy
-        (id, protocol, host, port, username, password)
-        VALUES (
-          '${id}',
-          '${values.protocol ?? "http"}',
-          '${values.host ?? ""}',
-          ${values.port ?? 8080},
-          '${values.username ?? ""}',
-          '${values.password ?? ""}'
-        )
-      `
-      await scorix.invoke("mod:gorm:Query", {sql})
+      const id = await scorix.invoke<string>("proxy:upsert", values)
       return id
     },
 

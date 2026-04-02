@@ -4,7 +4,8 @@ import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslation } from "react-i18next"
-import { forwardRef, useEffect, useImperativeHandle } from "react"
+import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react"
+import { toast } from "sonner"
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -36,35 +37,34 @@ interface ProxyFormProps {
   proxy: Partial<ProxyDO>
   onPendingChange?: (p: PendingState) => void
   onDeleted?: () => void
+  onSaved?: () => void
 }
 
-export const ProxyForm = forwardRef<ProxyFormRef, ProxyFormProps>(({ proxy, onPendingChange, onDeleted }, ref) => {
+export const ProxyForm = forwardRef<ProxyFormRef, ProxyFormProps>(({ proxy, onPendingChange, onDeleted, onSaved }, ref) => {
   const { t } = useTranslation()
   const upsert = useUpsertProxy()
   const remove = useDeleteProxy()
 
-  const form = useForm<ProxyFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
+  const defaultValues = useMemo(
+    () => ({
       id: proxy?.id,
       protocol: proxy?.protocol ?? "http",
       host: proxy?.host ?? "",
       port: proxy?.port ?? 8080,
       username: proxy?.username ?? "",
       password: proxy?.password ?? "",
-    },
+    }),
+    [proxy]
+  )
+
+  const form = useForm<ProxyFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: defaultValues,
   })
 
   useEffect(() => {
-    form.reset({
-      id: proxy?.id,
-      protocol: proxy?.protocol ?? "http",
-      host: proxy?.host ?? "",
-      port: proxy?.port ?? 8080,
-      username: proxy?.username ?? "",
-      password: proxy?.password ?? "",
-    })
-  }, [proxy, form])
+    form.reset(defaultValues)
+  }, [defaultValues, form])
 
   const pending: PendingState = {
     save: upsert.isPending,
@@ -78,8 +78,10 @@ export const ProxyForm = forwardRef<ProxyFormRef, ProxyFormProps>(({ proxy, onPe
   const onSubmit = async (values: ProxyFormValues) => {
     try {
       await upsert.mutateAsync(values)
-    } catch (error) {
-      console.error(error)
+      toast.success(t("saved"))
+      onSaved?.()
+    } catch (error: any) {
+      toast.error(error?.message ?? t("unknown_error"))
     }
   }
 
@@ -87,19 +89,28 @@ export const ProxyForm = forwardRef<ProxyFormRef, ProxyFormProps>(({ proxy, onPe
     if (!proxy?.id) return
     try {
       await remove.mutateAsync(proxy.id)
+      toast.success(t("deleted"))
       onDeleted?.()
-    } catch (error) {
-      console.error(error)
+    } catch (error: any) {
+      toast.error(error?.message ?? t("unknown_error"))
     }
   }
+
+  const submit = form.handleSubmit(onSubmit, errors => {
+    console.error("[ProxyForm] Validation Errors:", errors)
+    const firstError = Object.values(errors)[0]
+    if (firstError) {
+      toast.error(`${t("validation_error")}: ${firstError.message}`)
+    }
+  })
 
   useImperativeHandle(
     ref,
     () => ({
-      submit: () => form.handleSubmit(onSubmit)(),
+      submit,
       handleDelete,
     }),
-    [form, onSubmit, handleDelete]
+    [submit, handleDelete]
   )
 
   return (

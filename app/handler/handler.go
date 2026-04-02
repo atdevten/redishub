@@ -2,13 +2,15 @@ package handler
 
 import (
 	"context"
-
 	"runtime"
 
+	"github.com/tradalab/rdms/app/dal/do"
 	"github.com/tradalab/rdms/app/logic/client"
 	"github.com/tradalab/rdms/app/logic/conn"
 	"github.com/tradalab/rdms/app/logic/key"
+	"github.com/tradalab/rdms/app/logic/proxy"
 	"github.com/tradalab/rdms/app/logic/ssh"
+	"github.com/tradalab/rdms/app/logic/tls"
 	"github.com/tradalab/rdms/app/svc"
 )
 
@@ -72,9 +74,20 @@ func RegisterHandlers(svcCtx *svc.ServiceContext) {
 		"key:zset-member-del": func(ctx context.Context, args key.KeyZSetMemberDelLogicArgs) (interface{}, error) {
 			return key.NewKeyZSetMemberDelLogic(ctx, svcCtx).KeyZSetMemberDelLogic(args)
 		},
+		// proxy
+		"proxy:upsert": func(ctx context.Context, args do.ProxyDO) (interface{}, error) {
+			return proxy.NewProxyUpsertLogic(ctx, svcCtx).ProxyUpsertLogic(&args)
+		},
 		// ssh
 		"ssh:test": func(ctx context.Context, args ssh.SshTestLogicArgs) (interface{}, error) {
 			return ssh.NewSshTestLogic(ctx, svcCtx).SshTestLogic(args)
+		},
+		"ssh:upsert": func(ctx context.Context, args do.SshDO) (interface{}, error) {
+			return ssh.NewSshUpsertLogic(ctx, svcCtx).SshUpsertLogic(&args)
+		},
+		// tls
+		"tls:upsert": func(ctx context.Context, args do.TlsDO) (interface{}, error) {
+			return tls.NewTlsUpsertLogic(ctx, svcCtx).TlsUpsertLogic(&args)
 		},
 		// system
 		"system:info": func(ctx context.Context, args any) (interface{}, error) {

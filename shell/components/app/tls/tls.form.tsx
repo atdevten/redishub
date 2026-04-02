@@ -1,6 +1,6 @@
 "use client"
 
-import { forwardRef, useEffect, useImperativeHandle } from "react"
+import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react"
 import { useForm } from "react-hook-form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -47,8 +47,8 @@ export const TlsForm = forwardRef<TlsFormRef, Props>(({ tls, onPendingChange, on
 
   type TlsFormValues = z.infer<typeof tlsSchema>
 
-  const form = useForm<TlsFormValues>({
-    defaultValues: {
+  const defaultValues = useMemo(
+    () => ({
       id: tls.id,
       name: tls.name || "",
       use_sni: Boolean(tls.use_sni),
@@ -58,7 +58,12 @@ export const TlsForm = forwardRef<TlsFormRef, Props>(({ tls, onPendingChange, on
       ca_cert: tls.ca_cert || "",
       cert: tls.cert || "",
       key: tls.key || "",
-    },
+    }),
+    [tls]
+  )
+
+  const form = useForm<TlsFormValues>({
+    defaultValues: defaultValues,
     resolver: zodResolver(tlsSchema),
   })
 
@@ -66,18 +71,8 @@ export const TlsForm = forwardRef<TlsFormRef, Props>(({ tls, onPendingChange, on
   const deleteTls = useDeleteTls()
 
   useEffect(() => {
-    form.reset({
-      id: tls.id,
-      name: tls.name || "",
-      use_sni: Boolean(tls.use_sni),
-      server_name: tls.server_name || "",
-      verify: typeof tls.verify === "boolean" ? tls.verify : true,
-      client_auth: Boolean(tls.client_auth),
-      ca_cert: tls.ca_cert || "",
-      cert: tls.cert || "",
-      key: tls.key || "",
-    })
-  }, [tls, form])
+    form.reset(defaultValues)
+  }, [defaultValues, form])
 
   const pending: PendingState = {
     save: upsertTls.isPending,
@@ -88,15 +83,23 @@ export const TlsForm = forwardRef<TlsFormRef, Props>(({ tls, onPendingChange, on
     onPendingChange?.(pending)
   }, [pending.save, pending.delete])
 
-  const submit = form.handleSubmit(async values => {
-    try {
-      await upsertTls.mutateAsync(values as Partial<TlsDO>)
-      toast.success(t("saved"))
-      onSaved?.()
-    } catch (e: any) {
-      toast.error(e?.message ?? t("unknown_error"))
+  const submit = form.handleSubmit(
+    async values => {
+      try {
+        await upsertTls.mutateAsync(values as Partial<TlsDO>)
+        toast.success(t("saved"))
+        onSaved?.()
+      } catch (e: any) {
+        toast.error(e?.message ?? t("unknown_error"))
+      }
+    },
+    errors => {
+      const firstError = Object.values(errors)[0]
+      if (firstError) {
+        toast.error(`${t("validation_error")}: ${firstError.message}`)
+      }
     }
-  })
+  )
 
   const handleDelete = async () => {
     if (!tls?.id) return
