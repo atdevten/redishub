@@ -3,7 +3,6 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
 import scorix from "@/lib/scorix"
 import {TlsDO} from "@/types/tls.do"
-import {v7 as uuidv7} from "uuid"
 
 const QUERY_KEY = ["tls-list"]
 
@@ -22,24 +21,7 @@ export function useUpsertTls() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (values: Partial<TlsDO>) => {
-      const id = values.id ?? uuidv7()
-      const sql = `
-        INSERT
-        OR REPLACE INTO tls
-        (id, name, use_sni, server_name, verify, client_auth, ca_cert, cert, "key")
-        VALUES (
-          '${id}',
-          '${values.name ?? ""}',
-          ${values.use_sni ? 1 : 0},
-          '${values.server_name ?? ""}',
-          ${values.verify ? 1 : 0},
-          ${values.client_auth ? 1 : 0},
-          '${values.ca_cert ?? ""}',
-          '${values.cert ?? ""}',
-          '${values.key ?? ""}'
-        )
-      `
-      await scorix.invoke("mod:gorm:Query", {sql})
+      const id = await scorix.invoke<string>("tls:upsert", values)
       return id
     },
 

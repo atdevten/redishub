@@ -3,7 +3,6 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
 import scorix from "@/lib/scorix"
 import {SshDO} from "@/types/ssh.do"
-import {v7 as uuidv7} from "uuid"
 
 const QUERY_KEY = ["ssh-list"]
 
@@ -22,23 +21,7 @@ export function useUpsertSsh() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (values: Partial<SshDO>) => {
-      const id = values.id ?? uuidv7()
-      const sql = `
-        INSERT
-        OR REPLACE INTO ssh
-        (id, host, port, username, kind, password, private_key, passphrase)
-        VALUES (
-          '${id}',
-          '${values.host ?? ""}',
-          ${values.port ?? 22},
-          '${values.username ?? ""}',
-          '${values.kind ?? ""}',
-          '${values.password ?? ""}',
-          '${values.private_key ?? ""}',
-          '${values.passphrase ?? ""}'
-        )
-      `
-      await scorix.invoke("mod:gorm:Query", {sql})
+      const id = await scorix.invoke<string>("ssh:upsert", values)
       return id
     },
 
@@ -52,7 +35,7 @@ export function useDeleteSsh() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => {
-      const sql = `DELETE FROM ssh WHERE id = '${id}'`
+      const sql = `DELETE FROM "ssh" WHERE id = '${id}'`
       await scorix.invoke("mod:gorm:Query", {sql})
     },
     onSuccess: () => {

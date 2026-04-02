@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, forwardRef, useImperativeHandle } from "react"
+import { useEffect, forwardRef, useImperativeHandle, useMemo } from "react"
 import { useForm } from "react-hook-form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -36,8 +36,24 @@ interface Props {
 export const SshForm = forwardRef<SshFormRef, Props>(({ ssh, onPendingChange, onSaved, onDeleted }, ref) => {
   const { t } = useTranslation()
 
+  const defaultValues = useMemo(
+    () => ({
+      id: ssh.id,
+      host: ssh.host ?? "",
+      port: ssh.port ?? 22,
+      timeout: ssh.timeout ?? 60,
+      username: ssh.username ?? "",
+      kind: ssh.kind ?? SshKindEnum.PASSWORD,
+      password: ssh.password ?? "",
+      private_key: ssh.private_key ?? "",
+      passphrase: ssh.passphrase ?? "",
+    }),
+    [ssh]
+  )
+
   const sshSchema = z.object({
-    host: z.string(),
+    id: z.string().optional(),
+    host: z.string().min(1),
     port: z.number(),
     timeout: z.number(),
     username: z.string(),
@@ -50,17 +66,17 @@ export const SshForm = forwardRef<SshFormRef, Props>(({ ssh, onPendingChange, on
   type SshFormValues = z.infer<typeof sshSchema>
 
   const form = useForm<SshFormValues>({
-    defaultValues: ssh,
+    defaultValues: defaultValues,
     resolver: zodResolver(sshSchema),
   })
+
+  useEffect(() => {
+    form.reset(defaultValues)
+  }, [defaultValues, form])
 
   const upsertSsh = useUpsertSsh()
   const deleteSsh = useDeleteSsh()
   const testSsh = useTestSsh()
-
-  useEffect(() => {
-    form.reset(ssh)
-  }, [ssh, form])
 
   const kind = form.watch("kind")
 
@@ -74,15 +90,23 @@ export const SshForm = forwardRef<SshFormRef, Props>(({ ssh, onPendingChange, on
     onPendingChange?.(pending)
   }, [pending.save, pending.test, pending.delete])
 
-  const submit = form.handleSubmit(async values => {
-    try {
-      await upsertSsh.mutateAsync(values)
-      toast.success(t("saved"))
-      onSaved?.()
-    } catch (e: any) {
-      toast.error(e?.message ?? t("unknown_error"))
+  const submit = form.handleSubmit(
+    async values => {
+      try {
+        await upsertSsh.mutateAsync(values)
+        toast.success(t("saved"))
+        onSaved?.()
+      } catch (e: any) {
+        toast.error(e?.message ?? t("unknown_error"))
+      }
+    },
+    errors => {
+      const firstError = Object.values(errors)[0]
+      if (firstError) {
+        toast.error(`${t("validation_error")}: ${firstError.message}`)
+      }
     }
-  })
+  )
 
   const testConn = form.handleSubmit(async values => {
     try {
