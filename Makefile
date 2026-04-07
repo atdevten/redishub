@@ -44,13 +44,13 @@ help:
 # ─── Development ─────────────────────────────────────────────────────────────
 
 ## Full dev cycle: build frontend → inject into Go embed dir → run app
-dev: shell-build
+dev: shell-build _ensure-win-res
 	@echo "==> Injecting frontend into .scorix/dist"
 	@rm -rf $(SCORIX_DIST)
 	@mkdir -p $(SCORIX_DIST)
 	@cp -R $(SHELL_DIST)/. $(SCORIX_DIST)/
 	@echo "==> Running Go app"
-	go run main.go
+	go run .
 
 ## Run the Next.js dev server alone (no Go backend — UI only, for frontend work)
 shell-dev:
@@ -100,6 +100,12 @@ _ensure-embed:
 		cp -R dist/. ../$(SCORIX_DIST)/; \
 	fi
 
+_ensure-win-res:
+	@if [ "$$(go env GOOS)" = "windows" ]; then \
+		echo "==> Generating Windows icon resource..."; \
+		go run github.com/akavel/rsrc@latest -ico assets/icon.ico -o app_windows.syso; \
+	fi
+
 # ─── Redis (Docker) ──────────────────────────────────────────────────────────
 
 redis-up:
@@ -120,4 +126,4 @@ redis-init-cluster:
 # ─── Cleanup ─────────────────────────────────────────────────────────────────
 
 clean:
-	rm -rf $(SCORIX_DIST) $(SHELL_DIST) artifacts .scorix/AppDir
+	rm -rf $(SCORIX_DIST) $(SHELL_DIST) artifacts .scorix/AppDir app_windows.syso

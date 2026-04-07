@@ -57,10 +57,15 @@ echo "==> Building $APP_NAME $VERSION for $GOOS/$GOARCH"
 
 case "$GOOS" in
   windows)
+    echo "==> Generating Windows icon resource"
+    go run github.com/akavel/rsrc@latest -ico assets/icon.ico -o app_windows.syso
+
     echo "==> Build go app"
 
     GOOS=$GOOS GOARCH=$GOARCH \
-      go build -ldflags "-H=windowsgui" -o "$TEMP_DIR/$APP_NAME" ./main.go
+      go build -ldflags "-H=windowsgui" -o "$TEMP_DIR/$APP_NAME" .
+
+    rm -f app_windows.syso
 
     BIN_PATH="$TEMP_DIR/$APP_NAME.exe"
     mv "$TEMP_DIR/$APP_NAME" "$BIN_PATH"
@@ -97,12 +102,12 @@ case "$GOOS" in
       echo "+ Build amd64"
       CC_AMD64=${CC_amd64:-${CC:-gcc}}
       GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 CC="$CC_AMD64" \
-        go build -ldflags "-s -w" -o "$TEMP_DIR/amd64/$APP_NAME" ./main.go
+        go build -ldflags "-s -w" -o "$TEMP_DIR/amd64/$APP_NAME" .
 
       echo "+ Build arm64"
       CC_ARM64=${CC_arm64:-${CC:-gcc}}
       GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 CC="$CC_ARM64" \
-        go build -ldflags "-s -w" -o "$TEMP_DIR/arm64/$APP_NAME" ./main.go
+        go build -ldflags "-s -w" -o "$TEMP_DIR/arm64/$APP_NAME" .
 
       echo "+ Merge universal binary (lipo)"
       LIPO_CMD="lipo"
@@ -115,7 +120,7 @@ case "$GOOS" in
       $LIPO_CMD -create -output "$TEMP_DIR/$APP_NAME" "$TEMP_DIR/amd64/$APP_NAME" "$TEMP_DIR/arm64/$APP_NAME"
     else
       GOOS=$GOOS GOARCH=$GOARCH \
-        go build -o "$TEMP_DIR/$APP_NAME" ./main.go
+        go build -o "$TEMP_DIR/$APP_NAME" .
     fi
 
     echo "==> Packaging macOS .app + .dmg..."
@@ -158,7 +163,7 @@ EOF
 
   linux)
     GOOS=$GOOS GOARCH=$GOARCH \
-      go build -o "$TEMP_DIR/$APP_NAME" ./main.go
+      go build -o "$TEMP_DIR/$APP_NAME" .
 
     echo "==> Packaging Linux AppImage..."
 
